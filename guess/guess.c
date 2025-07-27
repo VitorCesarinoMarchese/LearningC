@@ -8,7 +8,10 @@ int main() {
   printf("***********************\n");
 
   int secretNumber = 57;
+  // aways define a value before using a variable
   int guess;
+  double points = 1000;
+
   int isReady;
   while (1) {
     printf("Are you ready?\n");
@@ -40,20 +43,25 @@ int main() {
         printf("Fell the future!\n");
         break;
       } else {
+        double penality;
         printf("You didn't find the secret!!!\n");
         printf("But I will give you a hint noob!\n");
 
         int isHigher = guess > secretNumber;
         if (isHigher) {
+          penality = (guess - secretNumber) / 2.0;
           printf("Your guess is higher than the secret\n");
         } else {
+          penality = (secretNumber - guess) / 2.0;
           printf("Your guess is lower than the secret\n");
         }
         printf("Fell the gap!\n");
+        points = points - (penality);
       }
     }
+    printf("You have %.1f points\n", points);
   } else {
-    printf("Ok, see you later!");
+    printf("Ok, see you later!\n");
   }
   return 0;
 }

@@ -36,13 +36,19 @@ int isRight(char letter) {
   return 0;
 }
 
-void printHangman() {
+void printHangman(int *erros, int *rights) {
+  int right = 0;
   for (int i = 0; i < strlen(secret); i++) {
     if (isRight(secret[i])) {
+      right++;
+      (*rights)++;
       printf("%c", secret[i]);
     } else {
       printf("_");
     }
+  }
+  if (!right) {
+    (*erros)++;
   }
   printf("\n");
 }
@@ -53,11 +59,21 @@ int main() {
   int win = 0;
   int dead = 0;
 
+  int erros = 0;
+  int rights = 0;
+
   opening();
 
   do {
-    printHangman();
+    printHangman(&erros, &rights);
     guess();
+    printf("%d", rights);
+    if (rights == strlen(secret)) {
+      win = 1;
+    }
+    if (erros == 5) {
+      dead = 1;
+    }
   } while (!win && !dead);
 
   return 0;

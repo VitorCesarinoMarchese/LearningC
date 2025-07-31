@@ -4,9 +4,9 @@
 #include <string.h>
 #include <time.h>
 
-char guesses[26];
+char guesses[MAX_GUESSES];
 int numberGuesses = 0;
-char secret[10];
+char secret[WORD_SIZE];
 
 void chooseWord() {
   FILE *f;
@@ -20,10 +20,9 @@ void chooseWord() {
   int nWords;
   fscanf(f, "%d", &nWords);
 
-  srand(time(0));
   int randomic = rand() % nWords;
 
-  for (int i = 0; i < randomic; i++) {
+  for (int i = 0; i <= randomic; i++) {
     fscanf(f, "%s", secret);
   }
 
@@ -38,9 +37,9 @@ void addWord() {
   scanf("%d", &add);
 
   if (add) {
-    char newWord[20];
-    printf("Type the word (max 20 carachters) you want to add: ");
-    scanf("%s", newWord);
+    char newWord[WORD_SIZE];
+    printf("Type the word (max 10 carachters) you want to add: ");
+    scanf("%9s", newWord);
 
     FILE *f;
 
@@ -57,8 +56,8 @@ void addWord() {
     fseek(f, 0, SEEK_SET);
     fprintf(f, "%d", numberWords);
 
-    fseek(f, 0, SEEK_END);
-    fprintf(f, "\n%s", newWord);
+    fseek(f, -1, SEEK_END);
+    fprintf(f, "%s\n", newWord);
 
     fclose(f);
   }
@@ -89,13 +88,15 @@ int isRight(char letter) {
   for (int j = 0; j < numberGuesses; j++) {
     if (guesses[j] == letter) {
       return 1;
-      break;
     }
   }
   return 0;
 }
 
 void printHangman() {
+  int errors = wrongGuesses();
+  printf("You have %d wrong %s left\n", 5 - errors,
+         errors == 4 ? "try" : "tries");
   for (int i = 0; i < strlen(secret); i++) {
     if (isRight(secret[i])) {
       printf("%c", secret[i]);
@@ -115,7 +116,7 @@ int win() {
   return 1;
 }
 
-int isDead() {
+int wrongGuesses() {
   int errors = 0;
   for (int i = 0; i < numberGuesses; i++) {
     int exist = 0;
@@ -126,10 +127,14 @@ int isDead() {
       errors++;
     }
   }
-  return errors >= 5;
+  return errors;
 }
 
+int isDead() { return wrongGuesses() >= MAX_ERRORS; }
+
 int main() {
+  srand(time(0));
+
   chooseWord();
 
   opening();
@@ -138,7 +143,11 @@ int main() {
     printHangman();
     guess();
   } while (!win() && !isDead());
-  addWord();
+  if (win()) {
+    printf("Congrats you win! 🏆\n");
+  } else {
+    printf("Noob you loose! 💀\n");
+  }
 
   return 0;
 }
